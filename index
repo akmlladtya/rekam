@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    .font-arab { font-family: 'Amiri', serif; }
+    .recording-pulse { animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
+    <div class="bg-emerald-600 p-6 text-center text-white">
+      <h1 class="text-2xl font-bold font-arab">قِرَاءَةُ الْقُرْآنِ</h1>
+      <p class="text-[10px] opacity-90 uppercase tracking-widest mt-1">Sistem Setoran Al-qur'an Kelas Al-Mubdi'</p>
+    </div>
+
+    <div class="flex border-b bg-gray-50">
+      <button onclick="switchRole('santri')" id="tab-santri" class="flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white transition-all">Santri</button>
+      <button onclick="switchRole('ustad')" id="tab-ustad" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-emerald-500 transition-all">Ustadz</button>
+    </div>
+
+    <div id="panel-santri" class="p-6 space-y-4">
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tanggal Setoran</label>
+        <input type="date" id="tglSantri" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition font-semibold text-emerald-800">
+      </div>
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Lengkap</label>
+        <input type="text" id="namaSantri" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Masukkan nama Anda">
+      </div>
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi Hafalan</label>
+        <input type="text" id="surahSantri" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Contoh: Al-Baqarah 1-10">
+      </div>
+      
+      <div class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300 text-center">
+        <p id="status-text" class="text-xs mb-4 font-medium text-gray-500 italic">Siap merekam</p>
+        <button id="btnRecord" onclick="toggleRecord()" class="w-16 h-16 rounded-full bg-red-500 text-white font-bold shadow-lg flex items-center justify-center mx-auto transition active:scale-95 hover:bg-red-600">
+          <span id="label-rec" class="text-xs">REC</span>
+        </button>
+        <audio id="audioPreview" controls class="w-full mt-5 hidden"></audio>
+      </div>
+
+      <button onclick="uploadData()" id="btnSubmit" disabled class="w-full py-4 rounded-xl bg-gray-300 text-white font-bold text-sm shadow-md transition-all">KIRIM SETORAN</button>
+    </div>
+
+    <div id="panel-ustad" class="hidden p-6 min-h-[400px]">
+      <div id="login-form" class="space-y-5 pt-4">
+        <div class="text-center">
+          <h3 class="font-bold text-gray-700">Akses Asatidz</h3>
+        </div>
+        <input type="password" id="passUstad" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-center" placeholder="Password">
+        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition shadow-lg">MASUK</button>
+      </div>
+
+      <div id="dashboard-ustad" class="hidden space-y-4">
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Filter Tanggal</label>
+          <input type="date" id="tglFilterUstad" onchange="refreshDataUstad()" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition font-semibold text-emerald-800">
+        </div>
+        
+        <div class="flex justify-between items-center border-b pb-2 pt-2">
+          <h3 class="font-bold text-gray-700 text-sm">Daftar Hafalan</h3>
+          <span id="count-info" class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold">0 Data</span>
+        </div>
+        
+        <div id="list-container" class="space-y-3 max-h-[300px] overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let mediaRecorder, audioChunks = [], audioBlob, isRecording = false;
+
+    // Set default tanggal hari ini
+    window.onload = () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('tglSantri').value = today;
+      document.getElementById('tglFilterUstad').value = today;
+    };
+
+    function switchRole(role) {
+      const isSantri = role === 'santri';
+      document.getElementById('panel-santri').classList.toggle('hidden', !isSantri);
+      document.getElementById('panel-ustad').classList.toggle('hidden', isSantri);
+      document.getElementById('tab-santri').className = isSantri ? "flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white" : "flex-1 py-4 text-sm font-bold text-gray-400 bg-gray-50 hover:text-emerald-500";
+      document.getElementById('tab-ustad').className = !isSantri ? "flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white" : "flex-1 py-4 text-sm font-bold text-gray-400 bg-gray-50 hover:text-emerald-500";
+    }
+
+    async function toggleRecord() {
+      const btn = document.getElementById('btnRecord');
+      const label = document.getElementById('label-rec');
+      const status = document.getElementById('status-text');
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.start();
+          isRecording = true;
+          label.innerText = "STOP";
+          btn.classList.add('recording-pulse', 'bg-gray-800');
+          status.innerText = "🔴 Merekam...";
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            document.getElementById('audioPreview').src = URL.createObjectURL(audioBlob);
+            document.getElementById('audioPreview').classList.remove('hidden');
+            document.getElementById('btnSubmit').disabled = false;
+            document.getElementById('btnSubmit').classList.replace('bg-gray-300', 'bg-emerald-600');
+          };
+        } catch(e) { Swal.fire('Error', 'Izin Mic ditolak.', 'error'); }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        label.innerText = "REC";
+        btn.classList.remove('recording-pulse', 'bg-gray-800');
+        status.innerText = "Selesai";
+      }
+    }
+
+    function uploadData() {
+      const nama = document.getElementById('namaSantri').value;
+      const surah = document.getElementById('surahSantri').value;
+      const tgl = document.getElementById('tglSantri').value;
+      if (!nama || !surah || !tgl) return Swal.fire('Lengkapi Data', '', 'warning');
+      
+      Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = () => {
+        const base64 = reader.result.split(',')[1];
+        google.script.run
+          .withSuccessHandler(res => {
+            Swal.fire('Berhasil', res.message, 'success').then(() => location.reload());
+          })
+          .uploadSetoran({ fileData: base64, nama, surah, tanggalPilihan: tgl });
+      };
+    }
+
+    function prosesLogin() {
+      refreshDataUstad();
+    }
+
+    function refreshDataUstad() {
+      const pw = document.getElementById('passUstad').value;
+      const tgl = document.getElementById('tglFilterUstad').value;
+      if(!pw) return;
+
+      const btn = document.getElementById('btnLogin');
+      btn.innerText = "Memuat...";
+      
+      google.script.run
+        .withSuccessHandler((res) => {
+          btn.innerText = "MASUK";
+          if (res.success) {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('dashboard-ustad').classList.remove('hidden');
+            renderList(res.data);
+          } else { Swal.fire('Ditolak', res.message, 'error'); }
+        })
+        .loginUstad(pw, tgl);
+    }
+
+    function renderList(data) {
+      const container = document.getElementById('list-container');
+      document.getElementById('count-info').innerText = data.length + " Data";
+      container.innerHTML = '';
+      if (data.length === 0) {
+        container.innerHTML = '<p class="text-center py-10 text-xs text-gray-400">Tidak ada setoran pada tanggal ini.</p>';
+        return;
+      }
+      data.forEach(item => {
+        container.innerHTML += `
+          <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
+            <div class="flex justify-between items-start">
+              <span class="font-bold text-gray-800 text-xs">${item.nama}</span>
+              <span class="text-[9px] text-gray-400 font-mono">${item.waktu}</span>
+            </div>
+            <div class="text-[10px] font-semibold text-emerald-600 mb-2">${item.surah}</div>
+            <audio controls preload="none" class="w-full h-8 outline-none">
+              <source src="${item.link}" type="audio/webm">
+              Browsermu tidak mendukung pemutar audio.
+            </audio>
+          </div>`;
+      });
+    }
+  </script>
+</body>
+</html>
