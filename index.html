@@ -5,100 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setoran Al-Mubdi'</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background: radial-gradient(circle at top right, #d1fae5, #f8fafc, #ccfbf1);
+      min-height: 100vh;
+    }
     .font-arab { font-family: 'Amiri', serif; }
-    .recording-pulse { animation: pulse 1.5s infinite; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    
+    /* Custom Scrollbar for list */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #059669; }
+
+    /* Animations & Shadows */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 25px 50px -12px rgba(5, 150, 105, 0.15);
+    }
+    .recording-pulse { animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+      70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
+    .input-field {
+      transition: all 0.3s ease;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
     }
-    canvas { width: 100%; height: 50px; border-radius: 8px; background: #064e3b; margin: 10px 0; }
+    .input-field:focus {
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center p-4 sm:p-6">
 
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
-    <div class="bg-emerald-600 p-6 text-center text-white">
-      <h1 class="text-2xl font-bold font-arab">قِرَاءَةُ الْقُرْآنِ</h1>
-      <p class="text-[10px] opacity-90 uppercase tracking-widest mt-1">Sistem Setoran Al-qur'an Kelas Al-Mubdi'</p>
+  <div class="glass-card rounded-[2rem] w-full max-w-md overflow-hidden border border-white relative z-10">
+    <div class="bg-gradient-to-br from-emerald-600 to-teal-800 p-8 text-center text-white relative overflow-hidden">
+      <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10 blur-2xl"></div>
+      <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-teal-300 opacity-20 blur-xl"></div>
+      
+      <div class="relative z-10">
+        <h1 class="text-4xl font-bold font-arab leading-tight mb-1 text-emerald-50">قِرَاءَةُ الْقُرْآنِ</h1>
+        <div class="w-12 h-1 bg-amber-400 mx-auto rounded-full mb-3 mt-2"></div>
+        <p class="text-[11px] font-semibold tracking-[0.2em] text-emerald-100/90 uppercase">Sistem Setoran Al-Mubdi'</p>
+      </div>
     </div>
 
-    <div class="flex border-b bg-gray-50">
-      <button onclick="switchRole('santri')" id="tab-santri" class="flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white transition-all">Santri</button>
-      <button onclick="switchRole('ustad')" id="tab-ustad" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-emerald-500 transition-all">Ustadz</button>
+    <div class="flex border-b border-gray-100 bg-white/50 relative">
+      <button onclick="switchRole('santri')" id="tab-santri" class="flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-500 transition-all">Form Santri</button>
+      <button onclick="switchRole('ustad')" id="tab-ustad" class="flex-1 py-4 text-sm font-semibold text-gray-400 hover:text-emerald-500 border-b-2 border-transparent transition-all">Panel Asatidz</button>
     </div>
 
-    <div id="panel-santri" class="p-6 space-y-4">
-      <div class="space-y-1">
-        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tanggal Setoran</label>
-        <input type="date" id="tglSantri" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition font-semibold text-emerald-800">
+    <div id="panel-santri" class="p-6 sm:p-8 space-y-5">
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Tanggal Setoran</label>
+        <input type="date" id="tglSantri" class="input-field w-full p-3.5 rounded-xl outline-none font-semibold text-gray-700 cursor-pointer">
       </div>
-      <div class="space-y-1">
-        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Lengkap</label>
-        <input type="text" id="namaSantri" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Masukkan nama Anda">
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Nama Santri</label>
+        <input type="text" id="namaSantri" class="input-field w-full p-3.5 rounded-xl outline-none text-gray-700" placeholder="Masukkan nama lengkap...">
       </div>
-      <div class="space-y-1">
-        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi Hafalan</label>
-        <input type="text" id="surahSantri" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Contoh: Al-Baqarah 1-10">
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Materi Hafalan</label>
+        <input type="text" id="surahSantri" class="input-field w-full p-3.5 rounded-xl outline-none text-gray-700" placeholder="Contoh: Al-Baqarah ayat 1-5">
       </div>
       
-      <div class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300 text-center">
-        <div id="timer" class="text-lg font-mono font-bold text-emerald-700 mb-1">00:00</div>
-        <canvas id="visualizer"></canvas>
-        <p id="status-text" class="text-xs mb-4 font-medium text-gray-500 italic">Siap merekam</p>
+      <div class="bg-slate-800 p-6 rounded-2xl shadow-inner relative overflow-hidden mt-2">
+        <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/50 to-transparent"></div>
         
-        <div class="flex items-center justify-center gap-4">
-          <button id="btnRecord" onclick="toggleRecord()" class="w-16 h-16 rounded-full bg-red-500 text-white font-bold shadow-lg flex items-center justify-center transition active:scale-95 hover:bg-red-600">
-            <span id="label-rec" class="text-xs">REC</span>
-          </button>
+        <div class="relative z-10 text-center">
+          <div id="timer" class="text-3xl font-mono font-light text-emerald-300 mb-2 tracking-widest drop-shadow-md">00:00</div>
           
-          <button id="btnPause" onclick="togglePause()" disabled class="w-12 h-12 rounded-full bg-orange-500 text-white font-bold shadow-md flex items-center justify-center transition active:scale-95 hover:bg-orange-600 hidden">
-            <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6" />
-            </svg>
-          </button>
-        </div>
+          <div class="h-14 w-full bg-black/30 rounded-xl mb-4 p-2 backdrop-blur-sm border border-white/5">
+            <canvas id="visualizer" class="w-full h-full rounded-lg"></canvas>
+          </div>
+          
+          <p id="status-text" class="text-xs font-medium text-emerald-200/70 uppercase tracking-widest mb-6">Siap Merekam</p>
+          
+          <div class="flex items-center justify-center gap-5">
+            <button id="btnRecord" onclick="toggleRecord()" class="w-16 h-16 rounded-full bg-red-500 text-white font-bold shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center justify-center transition-transform active:scale-90 hover:bg-red-400 relative">
+              <span id="label-rec" class="text-sm tracking-wider">REC</span>
+            </button>
+            
+            <button id="btnPause" onclick="togglePause()" disabled class="w-14 h-14 rounded-full bg-amber-500 text-white font-bold shadow-lg flex items-center justify-center transition-transform active:scale-90 hover:bg-amber-400 hidden">
+              <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6" />
+              </svg>
+            </button>
+          </div>
 
-        <audio id="audioPreview" controls class="w-full mt-5 hidden"></audio>
+          <audio id="audioPreview" controls class="w-full mt-6 rounded-lg opacity-90 hidden"></audio>
+        </div>
       </div>
 
-      <button onclick="uploadData()" id="btnSubmit" disabled class="w-full py-4 rounded-xl bg-gray-300 text-white font-bold text-sm shadow-md transition-all">KIRIM SETORAN</button>
+      <button onclick="uploadData()" id="btnSubmit" disabled class="w-full py-4 mt-2 rounded-xl bg-gray-200 text-gray-400 font-bold text-sm tracking-widest transition-all duration-300 uppercase">
+        Kirim Setoran
+      </button>
     </div>
 
-    <div id="panel-ustad" class="hidden p-6 min-h-[400px]">
-      <div id="login-form" class="space-y-5 pt-4">
+    <div id="panel-ustad" class="hidden p-6 sm:p-8 min-h-[450px]">
+      <div id="login-form" class="space-y-6 pt-8 pb-4">
         <div class="text-center">
-          <h3 class="font-bold text-gray-700">Akses Asatidz</h3>
+          <div class="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-800 text-lg">Otoritas Asatidz</h3>
+          <p class="text-xs text-gray-500 mt-1">Masukkan kata sandi untuk melihat setoran.</p>
         </div>
-        <input type="password" id="passUstad" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-center" placeholder="Password">
-        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition shadow-lg">MASUK</button>
+        <input type="password" id="passUstad" class="input-field w-full p-4 rounded-xl text-center tracking-widest text-lg" placeholder="••••••••">
+        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-teal-500/30 transition-all hover:-translate-y-0.5 uppercase tracking-widest text-sm">Masuk</button>
       </div>
 
-      <div id="dashboard-ustad" class="hidden space-y-4">
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Filter Tanggal</label>
-          <input type="date" id="tglFilterUstad" onchange="refreshDataUstad()" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition font-semibold text-emerald-800">
+      <div id="dashboard-ustad" class="hidden space-y-5 flex flex-col h-full">
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Filter Data per Tanggal</label>
+          <input type="date" id="tglFilterUstad" onchange="refreshDataUstad()" class="input-field w-full p-3.5 rounded-xl font-semibold text-emerald-800 cursor-pointer">
         </div>
         
-        <div class="flex justify-between items-center border-b pb-2 pt-2">
-          <h3 class="font-bold text-gray-700 text-sm">Daftar Hafalan</h3>
-          <span id="count-info" class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold">0 Data</span>
+        <div class="flex justify-between items-center border-b border-gray-100 pb-3 pt-2">
+          <h3 class="font-bold text-gray-800 text-sm">Daftar Rekaman</h3>
+          <span id="count-info" class="text-[10px] bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full font-bold uppercase tracking-wider shadow-sm">0 Data</span>
         </div>
         
-        <div id="list-container" class="space-y-3 max-h-[300px] overflow-y-auto pr-1"></div>
+        <div id="list-container" class="space-y-3 max-h-[300px] overflow-y-auto pr-2 pb-2"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // URL APPS SCRIPT PROF SEBAGAI API
+    // MASUKKAN URL APPS SCRIPT PROF DI SINI!
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwJ51QoIJhX4NHDQyJUF7QGjWIPP-JdXoIxigosMw2SRcSsRdXcXb6kr2FEEN4qKp9beg/exec";
 
     let mediaRecorder, audioChunks = [], audioBlob, isRecording = false, isPaused = false;
@@ -115,8 +160,12 @@
       const isSantri = role === 'santri';
       document.getElementById('panel-santri').classList.toggle('hidden', !isSantri);
       document.getElementById('panel-ustad').classList.toggle('hidden', isSantri);
-      document.getElementById('tab-santri').className = isSantri ? "flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white" : "flex-1 py-4 text-sm font-bold text-gray-400 bg-gray-50 hover:text-emerald-500";
-      document.getElementById('tab-ustad').className = !isSantri ? "flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 bg-white" : "flex-1 py-4 text-sm font-bold text-gray-400 bg-gray-50 hover:text-emerald-500";
+      
+      const activeClass = "flex-1 py-4 text-sm font-bold text-emerald-600 border-b-2 border-emerald-500 transition-all";
+      const inactiveClass = "flex-1 py-4 text-sm font-semibold text-gray-400 hover:text-emerald-500 border-b-2 border-transparent transition-all";
+      
+      document.getElementById('tab-santri').className = isSantri ? activeClass : inactiveClass;
+      document.getElementById('tab-ustad').className = !isSantri ? activeClass : inactiveClass;
     }
 
     function updateTimer() {
@@ -130,7 +179,7 @@
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const source = audioCtx.createMediaStreamSource(stream);
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 128; // Diperkecil agar bar lebih tebal dan smooth
       source.connect(analyser);
       const bufferLength = analyser.frequencyBinCount;
       dataArray = new Uint8Array(bufferLength);
@@ -140,15 +189,22 @@
       function draw() {
         animationId = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(dataArray);
-        ctx.fillStyle = '#064e3b';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        const barWidth = (canvas.width / bufferLength) * 2.5;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const barWidth = (canvas.width / bufferLength) * 2;
         let x = 0;
         for (let i = 0; i < bufferLength; i++) {
-          const barHeight = dataArray[i] / 4;
-          ctx.fillStyle = `rgb(52, 211, 153)`;
-          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-          x += barWidth + 1;
+          const barHeight = dataArray[i] / 3;
+          // Gradient untuk bar visualizer
+          const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
+          gradient.addColorStop(0, '#10b981'); // emerald-500
+          gradient.addColorStop(1, '#34d399'); // emerald-400
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.roundRect(x, canvas.height - barHeight, barWidth - 2, barHeight, 4);
+          ctx.fill();
+          x += barWidth;
         }
       }
       draw();
@@ -162,26 +218,25 @@
       
       if (!isRecording) {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: { channelCount: 1, sampleRate: 16000 } 
-          });
-          
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, sampleRate: 16000 } });
           const options = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 32000 };
-          mediaRecorder = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
-            ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
+          mediaRecorder = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
 
           audioChunks = [];
           mediaRecorder.start();
           isRecording = true;
           totalSeconds = 0;
           timerInterval = setInterval(updateTimer, 1000);
-          startVisualizer(stream);
+          
+          setTimeout(() => startVisualizer(stream), 100);
           
           label.innerText = "STOP";
-          btn.classList.add('recording-pulse', 'bg-gray-800');
+          btn.classList.add('recording-pulse');
+          btn.classList.replace('bg-red-500', 'bg-red-600');
           pauseBtn.classList.remove('hidden');
           pauseBtn.disabled = false;
-          status.innerText = "🔴 Merekam...";
+          status.innerText = "🔴 SEDANG MEREKAM...";
+          status.classList.add('text-red-400');
           
           mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
           
@@ -191,18 +246,30 @@
             audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             document.getElementById('audioPreview').src = URL.createObjectURL(audioBlob);
             document.getElementById('audioPreview').classList.remove('hidden');
-            document.getElementById('btnSubmit').disabled = false;
-            document.getElementById('btnSubmit').classList.replace('bg-gray-300', 'bg-emerald-600');
+            
+            // Aktifkan tombol submit dengan gaya premium
+            const btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.disabled = false;
+            btnSubmit.className = "w-full py-4 mt-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm tracking-widest shadow-lg shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5 uppercase";
+            
             stream.getTracks().forEach(track => track.stop());
+            
+            // Bersihkan canvas
+            const canvas = document.getElementById('visualizer');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
           };
-        } catch(e) { Swal.fire('Error', 'Izin Mic ditolak.', 'error'); }
+        } catch(e) { Swal.fire('Error', 'Izin Mikrofon ditolak browser.', 'error'); }
       } else {
         mediaRecorder.stop();
         isRecording = false;
         label.innerText = "REC";
-        btn.classList.remove('recording-pulse', 'bg-gray-800');
+        btn.classList.remove('recording-pulse');
+        btn.classList.replace('bg-red-600', 'bg-red-500');
         pauseBtn.classList.add('hidden');
-        status.innerText = "Selesai";
+        status.innerText = "SELESAI MEREKAM";
+        status.classList.remove('text-red-400');
+        status.classList.add('text-emerald-300');
       }
     }
 
@@ -213,48 +280,42 @@
         mediaRecorder.pause();
         isPaused = true;
         clearInterval(timerInterval);
-        status.innerText = "⏸ Pause";
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />';
+        status.innerText = "⏸ JEDA";
+        status.classList.replace('text-red-400', 'text-amber-300');
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />';
       } else {
         mediaRecorder.resume();
         isPaused = false;
         timerInterval = setInterval(updateTimer, 1000);
-        status.innerText = "🔴 Merekam...";
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6" />';
+        status.innerText = "🔴 SEDANG MEREKAM...";
+        status.classList.replace('text-amber-300', 'text-red-400');
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6" />';
       }
     }
 
-    // --- DIUBAH MENGGUNAKAN FETCH API KE GS ---
     function uploadData() {
       const nama = document.getElementById('namaSantri').value;
       const surah = document.getElementById('surahSantri').value;
       const tgl = document.getElementById('tglSantri').value;
-      if (!nama || !surah || !tgl) return Swal.fire('Lengkapi Data', '', 'warning');
+      if (!nama || !surah || !tgl) return Swal.fire({icon: 'warning', title: 'Data Belum Lengkap', text: 'Mohon isi nama dan materi hafalan.', confirmButtonColor: '#10b981'});
       
-      Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      Swal.fire({ title: 'Mengirim Setoran...', html: 'Mohon tunggu sebentar.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       const reader = new FileReader();
       reader.readAsDataURL(audioBlob);
       reader.onloadend = () => {
         const base64 = reader.result.split(',')[1];
-        
-        const payload = {
-          action: "upload",
-          data: { fileData: base64, nama: nama, surah: surah, tanggalPilihan: tgl }
-        };
+        const payload = { action: "upload", data: { fileData: base64, nama: nama, surah: surah, tanggalPilihan: tgl } };
 
-        fetch(GAS_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
-        })
+        fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) })
         .then(res => res.json())
         .then(res => {
           if (res.success) {
-            Swal.fire('Berhasil', res.message, 'success').then(() => location.reload());
+            Swal.fire({icon: 'success', title: 'Alhamdulillah!', text: res.message, confirmButtonColor: '#10b981'}).then(() => location.reload());
           } else {
-            Swal.fire('Gagal', res.message, 'error');
+            Swal.fire({icon: 'error', title: 'Gagal', text: res.message, confirmButtonColor: '#ef4444'});
           }
         }).catch(err => {
-          Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+          Swal.fire({icon: 'error', title: 'Koneksi Terputus', text: 'Gagal terhubung ke server.', confirmButtonColor: '#ef4444'});
         });
       };
     }
@@ -267,18 +328,11 @@
       if(!pw) return;
       
       const btn = document.getElementById('btnLogin');
-      btn.innerText = "Memuat...";
+      btn.innerText = "MEMVERIFIKASI...";
 
-      const payload = {
-        action: "login",
-        password: pw,
-        filterDate: tgl
-      };
+      const payload = { action: "login", password: pw, filterDate: tgl };
 
-      fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      })
+      fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) })
       .then(res => res.json())
       .then(res => {
         btn.innerText = "MASUK";
@@ -287,33 +341,43 @@
           document.getElementById('dashboard-ustad').classList.remove('hidden');
           renderList(res.data);
         } else { 
-          Swal.fire('Ditolak', res.message, 'error'); 
+          Swal.fire({icon: 'error', title: 'Akses Ditolak', text: res.message, confirmButtonColor: '#ef4444'}); 
         }
       }).catch(err => {
         btn.innerText = "MASUK";
-        Swal.fire('Error', 'Gagal memuat data.', 'error');
+        Swal.fire({icon: 'error', title: 'Error', text: 'Gagal memuat data.', confirmButtonColor: '#ef4444'});
       });
     }
 
     function renderList(data) {
       const container = document.getElementById('list-container');
-      document.getElementById('count-info').innerText = data.length + " Data";
+      document.getElementById('count-info').innerText = data.length + " Setoran";
       container.innerHTML = '';
       if (data.length === 0) {
-        container.innerHTML = '<p class="text-center py-10 text-xs text-gray-400">Tidak ada setoran pada tanggal ini.</p>';
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-10 opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="text-xs text-gray-500 font-medium">Belum ada setoran pada tanggal ini.</p>
+          </div>`;
         return;
       }
       data.forEach(item => {
         container.innerHTML += `
-          <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
-            <div class="flex justify-between items-start">
-              <span class="font-bold text-gray-800 text-xs">${item.nama}</span>
-              <span class="text-[9px] text-gray-400 font-mono">${item.waktu}</span>
+          <div class="p-4 bg-gray-50/50 hover:bg-emerald-50/50 border border-gray-100 rounded-2xl transition-colors duration-200">
+            <div class="flex justify-between items-start mb-1">
+              <span class="font-bold text-gray-800 text-sm">${item.nama}</span>
+              <span class="text-[10px] text-teal-600 bg-teal-100/50 px-2 py-1 rounded-md font-bold font-mono">${item.waktu}</span>
             </div>
-            <div class="text-[10px] font-semibold text-emerald-600 mb-2">${item.surah}</div>
-            <audio controls preload="none" class="w-full h-8 outline-none">
+            <div class="text-xs font-semibold text-emerald-600 mb-3 flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              ${item.surah}
+            </div>
+            <audio controls preload="none" class="w-full h-9 outline-none shadow-sm rounded-full">
               <source src="${item.link}" type="audio/webm">
-              Browsermu tidak mendukung pemutar audio.
             </audio>
           </div>`;
       });
